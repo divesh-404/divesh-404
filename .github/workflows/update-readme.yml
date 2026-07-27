@@ -1,0 +1,51 @@
+name: Update README
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update last-updated stamp
+        run: |
+          export DATE="$(date -u +'%Y-%m-%d')"
+          python3 <<'PY'
+          from pathlib import Path
+          import os
+
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          start = "<!--LAST_UPDATED_START-->"
+          end = "<!--LAST_UPDATED_END-->"
+          date = os.environ["DATE"]
+          block = f"{start}\n  <sub>Last updated: {date} UTC</sub>\n  {end}"
+
+          if start not in text or end not in text:
+              raise SystemExit("LAST_UPDATED markers not found in README.md")
+
+          before, _, rest = text.partition(start)
+          _, _, after = rest.partition(end)
+          path.write_text(before + block + after, encoding="utf-8")
+          print(f"README last-updated stamp set to {date} UTC")
+          PY
+
+      - name: Commit and push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          if git diff --staged --quiet; then
+            echo "No README changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: refresh README last-updated stamp"
+          git push

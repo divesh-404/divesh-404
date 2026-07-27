@@ -176,4 +176,8 @@ Solo founder of **[HUMAN](https://www.joinhuman.in/)**, a production campus soci
   </picture>
   <br /><br />
   <b>Made with ♥ by Divesh Kumavat</b>
+  <br />
+  <!--LAST_UPDATED_START-->
+  <sub>Last updated: —</sub>
+  <!--LAST_UPDATED_END-->
 </div>
